@@ -21,7 +21,7 @@ def init_db():
 
 init_db()
 
-# --- PAGE ROUTES ---
+
 
 @app.route('/')
 def login_page():
@@ -41,7 +41,7 @@ def dashboard():
         return redirect(url_for('login_page'))
     return render_template('home.html')
 
-# --- API ROUTES (Data handling) ---
+
 
 @app.route('/api/register', methods=['POST'])
 def register_api():
