@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f0f2f5; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        .link { text-align: center; margin-top: 15px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align:center;">Login</h2>
+    
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    
+    <button id="btn-login" type="button" onclick="submitLogin()">Sign In</button>
+    
+    <div class="link">
+        No account? <a href="/register">Register here</a>
+    </div>
+</div>
+
+<script>
+    async function submitLogin() {
+        console.log("Login button clicked...");
+        const btn = document.getElementById('btn-login');
+        const userVal = document.getElementById('username').value;
+        const passVal = document.getElementById('password').value;
+
+        if(!userVal || !passVal) {
+            alert("Please fill in all fields");
+            return;
+        }
+
+        // Disable button to prevent double clicks
+        btn.innerText = "Logging in...";
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: userVal, password: passVal })
+            });
+
+            const data = await res.json();
+            console.log("Server response:", data);
+
+            if (data.success) {
+                window.location.href = '/dashboard';
+            } else {
+                alert("Error: " + data.message);
+                btn.innerText = "Sign In";
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert("Connection failed. Make sure python app.py is running and you are at http://127.0.0.1:5000");
+            btn.innerText = "Sign In";
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

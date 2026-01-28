@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f0f2f5; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        .link { text-align: center; margin-top: 15px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align:center;">Register</h2>
+    
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="phone" placeholder="Phone Number">
+    
+    <button id="btn-reg" type="button" onclick="submitRegister()">Sign Up</button>
+    
+    <div class="link">
+        Have an account? <a href="/">Login here</a>
+    </div>
+</div>
+
+<script>
+    async function submitRegister() {
+        console.log("Register button clicked...");
+        const btn = document.getElementById('btn-reg');
+        
+        const payload = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value
+        };
+
+        if(!payload.username || !payload.password) {
+            alert("Username and Password are required");
+            return;
+        }
+
+        btn.innerText = "Registering...";
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await res.json();
+            console.log("Server response:", data);
+
+            if (data.success) {
+                alert(data.message);
+                window.location.href = '/';
+            } else {
+                alert("Error: " + data.message);
+                btn.innerText = "Sign Up";
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert("Connection failed. Check console (F12) for details.");
+            btn.innerText = "Sign Up";
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

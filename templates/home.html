@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; padding: 40px; }
+        .card { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; box-sizing: border-box; background: #e9ecef; }
+        input:enabled { background: #fff; border-color: #007bff; }
+        .btn-edit { width: 100%; padding: 10px; background: #ffc107; border: none; cursor: pointer; }
+        .btn-save { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        <h2>Welcome, <span id="display-name">User</span></h2>
+        <a href="/logout" style="color:red; text-decoration:none;">Logout</a>
+    </div>
+
+    <label>Email Address</label>
+    <input type="text" id="inp-email" disabled>
+
+    <label>Phone Number</label>
+    <input type="text" id="inp-phone" disabled>
+
+    <button id="action-btn" class="btn-edit" onclick="handleEdit()">Edit Profile</button>
+</div>
+
+<script>
+    const emailInput = document.getElementById('inp-email');
+    const phoneInput = document.getElementById('inp-phone');
+    const actionBtn = document.getElementById('action-btn');
+    let isEditing = false;
+
+    async function loadProfile() {
+        const res = await fetch('/api/user');
+        const data = await res.json();
+        document.getElementById('display-name').innerText = data.username;
+        emailInput.value = data.email;
+        phoneInput.value = data.phone;
+    }
+
+    async function handleEdit() {
+        if (!isEditing) {
+            isEditing = true;
+            emailInput.disabled = false;
+            phoneInput.disabled = false;
+            actionBtn.innerText = "Save Changes";
+            actionBtn.classList.add('btn-save');
+        } else {
+            const res = await fetch('/api/user', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    email: emailInput.value,
+                    phone: phoneInput.value
+                })
+            });
+            const data = await res.json();
+            alert(data.message);
+            isEditing = false;
+            emailInput.disabled = true;
+            phoneInput.disabled = true;
+            actionBtn.innerText = "Edit Profile";
+            actionBtn.classList.remove('btn-save');
+        }
+    }
+    loadProfile();
+</script>
+</body>
+</html>
